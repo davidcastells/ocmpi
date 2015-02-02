@@ -1,0 +1,1 @@
+#define RETURN_CPU_IDENTIFIER() register int cpuid;NIOS2_READ_CPUID(cpuid);return cpuid;

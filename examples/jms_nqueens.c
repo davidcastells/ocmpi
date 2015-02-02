@@ -116,7 +116,7 @@
 #ifdef WIN32
 
 #define MAX_BOARDSIZE 21
-typedef unsigned __int64 SOLUTIONTYPE;
+typedef unsigned long long SOLUTIONTYPE;
 
 #else
 

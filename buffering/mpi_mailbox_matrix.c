@@ -93,8 +93,10 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
     
     MPI_Type_size(datatype, &datasize);
 
+#ifdef NIOS
     alt_dcache_flush(buf, datasize * count);
-
+#endif
+    
     CacheBypassWriteInt(&pMsg->data, (int) buf);
     
 #ifdef NIOS

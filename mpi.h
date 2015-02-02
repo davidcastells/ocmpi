@@ -84,11 +84,11 @@ typedef struct _MPI_Msg
 {
 	int src;
 	int dst;
-	void* data;
-	int count;
 	MPI_Datatype type;
 	int tag;
 	int comm;
+	int count;
+	void* data;
 } MPI_Msg;
 
 typedef struct _MPI_Request
@@ -133,5 +133,7 @@ int mpi_rank();
 void mpi_sleepMilliseconds(int milliseconds);
 
 //extern char* MPI_Debug;
+extern int mpi_global_error;
+extern double MPI_Tx_Timeout;
 
 #endif /* MPI_H_ */

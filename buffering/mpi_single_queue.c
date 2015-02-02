@@ -1,28 +1,28 @@
-#include "mpi.h"
-#include "config.h"
+#include "../mpi.h"
+#include "../config.h"
 
 #include <stdio.h>
 
 #ifdef WIN32
-#include "arch/windows/PerformanceCounter.h"
-#include "arch/windows/mutex.h"
-#include "arch/windows/cpuid.h"
-#include "arch/windows/CacheBypass.h"
+#include "../arch/windows/PerformanceCounter.h"
+#include "../arch/windows/mutex.h"
+#include "../arch/windows/cpuid.h"
+#include "../arch/windows/CacheBypass.h"
 #endif
 
 #ifdef NIOS
 #include <nios2.h>
-#include "arch/nios/PerformanceCounter.h"
-#include "arch/nios/mutex.h"
-#include "arch/nios/cpuid.h"
-#include "arch/nios/CacheBypass.h"
+#include "../arch/nios/PerformanceCounter.h"
+#include "../arch/nios/mutex.h"
+#include "../arch/nios/cpuid.h"
+#include "../arch/nios/CacheBypass.h"
 #endif
 
 #ifdef LINUX
-#include "arch/linux/PerformanceCounter.h"
-#include "arch/linux/mutex.h"
-#include "arch/linux/cpuid.h"
-#include "arch/linux/CacheBypass.h"
+#include "../arch/linux/PerformanceCounter.h"
+#include "../arch/linux/mutex.h"
+#include "../arch/linux/cpuid.h"
+#include "../arch/linux/CacheBypass.h"
 #endif
 
 

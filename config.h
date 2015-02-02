@@ -8,8 +8,10 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#define STACK_SIZE (0x400 )
 
-#define NUM_OF_PROCESSORS	8
+#define NUM_OF_PROCESSORS		128
+#define SIZE_OF_MPI_APPLICATION		128
 
 
 

@@ -36,13 +36,13 @@
 #include <string.h>
 
 // initialization
-int	MPI_Process_level[NUM_OF_PROCESSORS];			// current level of each process
-int MPI_Process_waiting[NUM_OF_PROCESSORS - 1];		// the waiting process of each level 1..N
+//int	MPI_Process_level[NUM_OF_PROCESSORS];			// current level of each process
+//int MPI_Process_waiting[NUM_OF_PROCESSORS - 1];		// the waiting process of each level 1..N
 
 
 
 char MPI_Last_Error[200];
-int MPI_master_init = 0;
+//int MPI_master_init = 0;
 int MPI_Barrier_Count = 0;
 int MPI_Barrier_Exit_Count = NUM_OF_PROCESSORS;
 
@@ -54,7 +54,9 @@ int MPI_initialized[NUM_OF_PROCESSORS];		// an array with the initialization sta
 
 
 double MPI_Rx_Timeout = 0;		// rx timeout in seconds
+double MPI_Tx_Timeout = 10;		// rx timeout in seconds
 
+int mpi_global_error = 0;		// global error
 
 #define MPI_ENTER_TRACE(x)		CacheBypassWriteInt(&MPI_initialized[0], (int) x);
 
@@ -74,20 +76,6 @@ void MPI_Debug_Report()
 
 		printf("Processor %d initialized = %d\n", i, v);
 	}
-
-
-/*	CacheBypassReadInt(&MPI_Buffer_Count);
-
-	printf("MPI_Buffer_Count: %d\n", MPI_Buffer_Count);
-
-	for (i=0; i < MPI_Buffer_Count; i += 4)
-	{
-		CacheBypassRead(&MPI_Buffer[i], 4);
-		printf("%p - %02X %02X %02X %02X - %c%c%c%c\n", &MPI_Buffer[i],
-				MPI_Buffer[i], MPI_Buffer[i+1], MPI_Buffer[i+2], MPI_Buffer[i+3],
-				VALID_ASCII(MPI_Buffer[i]), VALID_ASCII(MPI_Buffer[i+1]), VALID_ASCII(MPI_Buffer[i+2]), VALID_ASCII(MPI_Buffer[i+3]));
-	}
-*/
 }
 
 
@@ -102,13 +90,15 @@ int MPI_Init(int* argc, char*** args)
 		int i;
 		//CacheBypassWriteInt(&MPI_Buffer_Count, 0);
 		//CacheBypassWriteInt(&MPI_Message_Count, 0);
-                mpi_clear_vars();
+		mpi_clear_vars();
 
-		MPI_Debug_Report();
+		//MPI_Debug_Report();
 
-		CacheBypassWriteInt(&MPI_master_init, 1);
+		//CacheBypassWriteInt(&MPI_master_init, 1);
 
+		MPI_enterCriticalSection();
 		printf("[CPU%d] >>MPI_Init\n", rank);
+		MPI_leaveCriticalSection();
 
 /*		for (i=0; i < NUM_OF_PROCESSORS; i++)
 			printf("MPI_initialized[%d] pointer %p\n", i, &MPI_initialized[i]);
@@ -140,6 +130,8 @@ loop:
 
 	CacheBypassWriteInt(&MPI_initialized[rank], 1);
 
+	printf("[cpu%d] initialized. Init count = %d\n", rank, numInitialized);
+
 
 	MPI_leaveCriticalSection();
 
@@ -153,21 +145,30 @@ loop:
 
 //		mpi_sleepMilliseconds(1000);
             }
+            //mpi_sleepMilliseconds(1000);
 		goto loop;
 	}
 
 
         if (rank == 0)
+        {
+        	MPI_enterCriticalSection();
 		printf("[CPU%d] <<MPI_Init\n", rank);
+		MPI_leaveCriticalSection();
+        }
+
+
+        if (rank >= SIZE_OF_MPI_APPLICATION)
+        	while (1);
 
 	return MPI_SUCCESS;
 }
 
 int MPI_Finalize()
 {
-	MPI_enterCriticalSection();
+	/*MPI_enterCriticalSection();
 	MPI_AddDebugLine('F', 0);
-	MPI_leaveCriticalSection();
+	MPI_leaveCriticalSection();*/
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
@@ -191,7 +192,7 @@ int MPI_Comm_rank(MPI_Comm comm, int *rank)
 
 int MPI_Comm_size(MPI_Comm comm,  int *size)
 {
-	*size = NUM_OF_PROCESSORS;
+	*size = SIZE_OF_MPI_APPLICATION;
 	return MPI_SUCCESS;
 }
 
@@ -262,6 +263,14 @@ int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, M
         //printf("message recv %d->%d\n", source, mpi_rank());
 #endif
 
+	if (mpi_rank() == 0 && CacheBypassReadInt(&mpi_global_error))
+	{
+		printf("ERROR: Global Error occurred\n");
+		MPI_Debug_Show_Messages();
+		while (1);
+	}
+
+
 	perfCounter(&t0);
 loop:
 	result = mpi_Irecv(buf, count, datatype, source, tag, comm, status);
@@ -275,18 +284,21 @@ loop:
 			mpi_sleepMilliseconds(3000);
 		}*/
 
-                MPI_Debug_Show_Messages();
                 
+
 		if (MPI_Rx_Timeout != 0)
 		{
 			if (secondsBetweenLaps(t0, tf) > MPI_Rx_Timeout)
 				return MPI_ERR_TIMEOUT;
 		}
 
+		/*
 		if (retries < 100)
 			retries++;
+		else
+			MPI_Debug_Show_Messages();
 
-		mpi_sleepMilliseconds(retries);
+		mpi_sleepMilliseconds(retries);*/
 
 		goto loop;
 	}
@@ -353,7 +365,10 @@ int MPI_Barrier( MPI_Comm comm )
 			if (error != MPI_SUCCESS)
 			{
 				printf("[ERROR] MPI_Barrier error: %d receiving from %d\n", error, i);
-				MPI_Debug_Report();
+				//MPI_Debug_Report();
+				//MPI_DumpDebug();
+				MPI_Debug_Show_Messages();
+
 			}
 //			printf("barrier rcv from %d\n", i);
 

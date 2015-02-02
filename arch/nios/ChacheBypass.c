@@ -1,20 +1,16 @@
 #include "CacheBypass.h"
 
+#include <nios2.h>
+#include <io.h>
+
+#define ALT_FLUSH_DATA_NO_WRITEBACK(i) \
+  __asm__ volatile ("initda (%0)" :: "r" (i));
+
 void CacheBypassRead(int* ptr, int size)
 {
 	int i;
 	for (i=0; i < size/4; i++)
-		CacheBypassReadInt(&ptr[i]);
-
-	if (size % 4 != 0)
-		CacheBypassReadInt(&ptr[i]);
-}
-
-void CacheBypassWrite(int* ptr, int size)
-{
-	int i;
-	for (i=0; i < size/4; i++)
-		CacheBypassWriteInt(&ptr[i], ptr[i]);
+		ptr[i] = IORD(&ptr[i], 0);
 
 	size = size % 4;
 
@@ -23,35 +19,67 @@ void CacheBypassWrite(int* ptr, int size)
 		char* pb = (char*) &ptr[i];
 
 		for (i=0; i < size; i++)
-			CacheBypassWriteByte(&pb[i], pb[i]);
+			pb[i] = IORD_8DIRECT(&pb[i], 0);
 	}
+
+}
+
+void CacheBypassWrite(int* ptr, int size)
+{
+	int i;
+	for (i=0; i < size/4; i++)
+		IOWR(&ptr[i], 0, ptr[i]);
+
+	size = size % 4;
+
+	if (size)
+	{
+		char* pb = (char*) &ptr[i];
+
+		for (i=0; i < size; i++)
+			IOWR_8DIRECT(&pb[i], 0, pb[i]);
+	}
+
+	alt_dcache_flush_no_writeback(ptr, size);
 }
 
 
 
 int CacheBypassReadInt(int* ptr)
 {
-	*ptr = IORD(ptr, 0);	// read from memory and update cache
+	register int v;
 
-	return *ptr;
+	ALT_FLUSH_DATA_NO_WRITEBACK(ptr);
+	v = IORD(ptr, 0);	// read from memory and update cache
+
+	//*ptr = v;
+
+	return v;
 }
 
 int CacheBypassReadByte(char* ptr)
 {
-	*ptr = IORD_8DIRECT(ptr, 0);	// read from memory and update cache
+	int v;
+	ALT_FLUSH_DATA_NO_WRITEBACK(ptr);
+	v = IORD_8DIRECT(ptr, 0);	// read from memory and update cache
+	//*ptr = v;
 
-	return *ptr;
+	return v;
 }
 
 void CacheBypassWriteInt(int* ptr, int v)
 {
-	*ptr = v;				// write cache
+	ALT_FLUSH_DATA_NO_WRITEBACK(ptr);
+
+	//*ptr = v;				// write cache
 	IOWR(ptr, 0, (v));
 }
 
 void CacheBypassWriteByte(char* ptr, char v)
 {
-	*ptr = v;				// write cache
+	ALT_FLUSH_DATA_NO_WRITEBACK(ptr);
+
+	//*ptr = v;				// write cache
 	IOWR_8DIRECT(ptr, 0, (v));
 }
 

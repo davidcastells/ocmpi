@@ -11,6 +11,7 @@
 #define USING_OC_MPI		1
 
 #define MPI_Comm	int
+#define MPI_Op          int
 
 /* error return classes */
 #define MPI_SUCCESS          0      /* Successful return code */
@@ -66,9 +67,24 @@
 #define MPI_TAG_INTERNAL_MASK	0xFFFF0000
 #define MPI_ANY_TAG         		(MPI_TAG_UB+2)
 #define MPI_INTERNAL_BARRIER_TAG	(MPI_TAG_UB+3)
+#define MPI_INTERNAL_REDUCE_TAG         (MPI_TAG_UB+4)
 
 #define MPI_REQUEST_RECV	1
 #define MPI_REQUEST_SEND	2
+
+
+#define MPI_MAX     1
+#define MPI_MIN     2
+#define MPI_SUM     3 
+#define MPI_PROD    4
+#define MPI_LAND    5
+#define MPI_BAND    6
+#define MPI_LOR     7
+#define MPI_BOR     8
+#define MPI_LXOR    9
+#define MPI_BXOR    10
+#define MPI_MAXLOC  11
+#define MPI_MINLOC  12
 
 /*
 */
@@ -107,7 +123,7 @@ int MPI_Finalize();
 int MPI_Comm_rank(MPI_Comm comm, int *rank);
 int MPI_Comm_size(MPI_Comm comm,  int *size);
 double MPI_Wtime();
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
+int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request* request);
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
 int MPI_Test(MPI_Request* request, int* flag, MPI_Status* status);

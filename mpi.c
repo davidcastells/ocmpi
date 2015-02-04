@@ -130,7 +130,8 @@ loop:
 
 	CacheBypassWriteInt(&MPI_initialized[rank], 1);
 
-	printf("[cpu%d] initialized. Init count = %d\n", rank, numInitialized);
+	if (rank == 0)
+        printf("[cpu%d] initialized. Init count = %d\n", rank, numInitialized);
 
 
 	MPI_leaveCriticalSection();
@@ -389,6 +390,89 @@ int MPI_Barrier( MPI_Comm comm )
 	}
 
 	return MPI_SUCCESS;
+}
+
+/**
+ * 
+ * @param sendbuf
+ * @param recvbuf
+ * @param count
+ * @param datatype
+ * @param op
+ * @param root
+ * @param comm
+ * @return 
+ */
+int MPI_Reduce(const void *sendBuf, 
+        void *recvbuf, 
+        int count, 
+        MPI_Datatype datatype,
+        MPI_Op op, int root, MPI_Comm comm)
+{
+    double* pDoubleArg = (double*) sendBuf;
+    double* pDoubleResult = (double*) recvbuf;
+    int* pIntArg = (int*) sendBuf;
+    int* pIntResult = (int*) recvbuf;
+    
+    int rank, size, i, slave;
+    int typeSize;
+    
+    MPI_Comm_rank(comm, &rank);
+    MPI_Comm_size(comm, &size);
+    
+    MPI_Type_size(datatype, &typeSize);
+    
+    if (rank == 0)
+    {
+        // reduce from root
+        for (i=0; i < count; i++)
+        {
+            if (datatype == MPI_DOUBLE) 
+            {
+                pDoubleResult[i] = pDoubleArg[i];
+                //printf("res[%d]+=%g -> %g\n", i, pDoubleArg[i], pDoubleResult[i]);
+            }
+            else if (datatype == MPI_INT)
+                pIntResult[i] = pIntArg[i];
+            else
+                return MPI_ERR_TYPE;
+        }
+        
+        // reduce from slaves
+        for (slave=1; slave < size; slave++)
+        {
+            MPI_Status status;
+            char tempBuf[typeSize * count];
+            double* pDoubleTemp = (double*) tempBuf;
+            int* pIntTemp = (int*) tempBuf;
+            
+            MPI_Recv((void *)tempBuf, count, datatype, slave, MPI_INTERNAL_REDUCE_TAG, comm, &status);
+                    
+            for (i=0; i < count; i++)
+            {
+                if (op == MPI_SUM)
+                {
+                    if (datatype == MPI_DOUBLE) 
+                    {
+                        pDoubleResult[i] += pDoubleTemp[i];
+                        //printf("res[%d]+=%g -> %g\n", i, pDoubleTemp[i], pDoubleResult[i]);
+                    }
+                    else if (datatype == MPI_INT)
+                        pIntResult[i] += pIntTemp[i];
+                    else
+                        return MPI_ERR_TYPE;
+                }
+                else 
+                    return MPI_ERR_OP;
+            }
+        }
+    }
+    else
+    {
+        MPI_Send(sendBuf, count, datatype, 0, MPI_INTERNAL_REDUCE_TAG, comm);
+    }
+    
+    return MPI_SUCCESS;
 }
 
 

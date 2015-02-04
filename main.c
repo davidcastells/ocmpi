@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "examples/mpiqueens2.h"
+#include "examples/mpi_pi.h"
 
 #ifdef WIN32
     #include "arch/windows/mutex.h"
@@ -29,11 +30,15 @@ int main(int argc, char** argv)
 {
     initMutex();
     
-    /*createSlaveThreads(mpiqueens2_main);
+    createSlaveThreads(mpi_pi_main);
+    return mpi_pi_main(argc, argv);
     
-    return mpiqueens2_main(argc, argv);*/
-    
+    /*
+    createSlaveThreads(mpiqueens2_main);
+    return mpiqueens2_main(argc, argv);
+     * /
+    /*
     createSlaveThreads(jms_nqueens_main);
-    return jms_nqueens_main(argc, argv);
+    return jms_nqueens_main(argc, argv);*/
 }
 

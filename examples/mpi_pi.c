@@ -19,12 +19,12 @@
 #include <stdlib.h>
 #include "../mpi.h"
 
-int mpi_pi_main(int argc, char *argv[]) 
+int mpi_pi_fp_main(int argc, char *argv[]) 
 {
   int myid,nprocs;
   int err;
   
-  long long int npts = 1280;
+  long long int npts = 1280000000;
   long long int i,mynpts;
 
   double f,sum,mysum;
@@ -39,7 +39,7 @@ int mpi_pi_main(int argc, char *argv[])
   if (myid == 0) 
   {
 	  MPI_enterCriticalSection();
-	  printf("INFO: Computing PI with %d processors and %d points\n", nprocs, npts);
+	  printf("INFO: Computing PI (Floating Point Version) with %d processors and %d points\n", nprocs, npts);
 	  MPI_leaveCriticalSection();
       t0 = MPI_Wtime();
         mynpts = npts - (nprocs-1)*(npts/nprocs);
@@ -77,6 +77,104 @@ int mpi_pi_main(int argc, char *argv[])
   if (myid == 0)
   {
     f = sum/npts;
+    
+    tf = MPI_Wtime();
+
+    printf("PI calculated with %lld points = %g \n",npts,f);
+    printf("PI Computed in %g seconds\n", (tf-t0));
+    
+  }
+  
+
+  MPI_Finalize();
+
+
+}
+
+
+/**
+ * Integer computation of PI
+ * @param argc
+ * @param argv
+ * @return 
+ */
+int mpi_pi_int_main(int argc, char *argv[]) 
+{
+  int myid,nprocs;
+  int err;
+  
+  long long int npts = 1280000000;
+  long long int i,mynpts;
+
+  
+  int x;
+  int y;
+  int z;
+  
+  double f;
+  double t0, tf;
+  long long count = 0;
+  long long finalCount = 0;
+  
+  MPI_Init(&argc,&argv);
+  MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+  MPI_Comm_rank(MPI_COMM_WORLD,&myid);
+  
+  if (myid == 0) 
+  {
+	  MPI_enterCriticalSection();
+	  printf("INFO: Computing PI (Integer Version) with %d processors and %d points\n", nprocs, npts);
+	  MPI_leaveCriticalSection();
+      t0 = MPI_Wtime();
+        mynpts = npts - (nprocs-1)*(npts/nprocs);
+  } 
+  else 
+  {
+        mynpts = npts/nprocs;
+  }
+
+  
+  MPI_enterCriticalSection();
+  printf("cpu[%d] srand\n", mpi_rank());
+  MPI_leaveCriticalSection();
+
+  srand(myid);
+
+#define FIXED_POINT_ONE     (1<<15)
+  
+  for ( i=0; i<mynpts; i++) 
+  {
+      x = rand() % FIXED_POINT_ONE;
+      y = rand() % FIXED_POINT_ONE;
+      z = ((x*x)>>15)+((y*y)>>15);
+      if (z<=FIXED_POINT_ONE) count++;
+      
+      /*printf("cpu[%d] x = %g   y = %g  z= %g count = %lld\n", mpi_rank(), 
+              (double) (x/(double)FIXED_POINT_ONE),
+              (double) (y/(double)FIXED_POINT_ONE),
+              (double) (z/(double)FIXED_POINT_ONE),
+              count);*/
+  }
+  
+  err = MPI_Reduce(&count, &finalCount, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+  
+  if (err != MPI_SUCCESS)
+      printf("cpu[%d] ERROR %d\n", mpi_rank(), err);
+  
+  
+   
+   
+  
+  
+  /*MPI_enterCriticalSection();
+  printf("cpu[%d] mysum = %g\n", mpi_rank(), mysum);
+  MPI_leaveCriticalSection();*/
+  
+  
+  if (myid == 0)
+  {
+      //printf("final count %lld\n", finalCount );
+    f=(double)finalCount/npts*4;
     
     tf = MPI_Wtime();
 

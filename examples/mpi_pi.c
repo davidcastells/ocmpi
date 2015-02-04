@@ -24,7 +24,7 @@ int mpi_pi_main(int argc, char *argv[])
   int myid,nprocs;
   int err;
   
-  long long int npts = 1e10;
+  long long int npts = 1280;
   long long int i,mynpts;
 
   double f,sum,mysum;
@@ -38,6 +38,9 @@ int mpi_pi_main(int argc, char *argv[])
   
   if (myid == 0) 
   {
+	  MPI_enterCriticalSection();
+	  printf("INFO: Computing PI with %d processors and %d points\n", nprocs, npts);
+	  MPI_leaveCriticalSection();
       t0 = MPI_Wtime();
         mynpts = npts - (nprocs-1)*(npts/nprocs);
   } 
@@ -49,6 +52,10 @@ int mpi_pi_main(int argc, char *argv[])
   mysum = 0.0;
   xmin = 0.0;
   xmax = 1.0;
+
+  MPI_enterCriticalSection();
+  printf("cpu[%d] srand\n", mpi_rank());
+  MPI_leaveCriticalSection();
 
   srand(myid);
 

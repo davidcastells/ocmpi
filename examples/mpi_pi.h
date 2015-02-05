@@ -24,7 +24,8 @@ extern "C" {
 
 
 int mpi_pi_fp_main(int argc, char *argv[]) ;
-int mpi_pi_int_main(int argc, char *argv[]) ;
+int mpi_pi_montecarlo_int_main(int argc, char *argv[]) ;
+int mpi_pi_full_int_main(int argc, char *argv[]);
 
 
 #ifdef	__cplusplus

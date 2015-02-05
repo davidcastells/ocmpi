@@ -30,8 +30,8 @@ int main(int argc, char** argv)
 {
     initMutex();
     
-    createSlaveThreads(mpi_pi_main);
-    return mpi_pi_main(argc, argv);
+    createSlaveThreads(mpi_pi_montecarlo_int_main);
+    return mpi_pi_montecarlo_int_main(argc, argv);
     
     /*
     createSlaveThreads(mpiqueens2_main);

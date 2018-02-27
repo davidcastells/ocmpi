@@ -1,7 +1,16 @@
 /**
+ * Copyright (C) David Castells-Rufas, CEPHIS, Universitat Autonoma de Barcelona  
+ * david.castells@uab.cat
  * 
- * Copyright (C) 2015, David Castells-Rufas <david.castells@uab.es>, CEPHIS, Universitat Autonoma de Barcelona  
- *
+ * This work was used in the publication of 
+ * "128-core Many-Soft-Core Processor with MPI support" 
+ * available online on 
+ * https://www.researchgate.net/publication/282124163_128-core_Many-Soft-Core_Processor_with_MPI_support
+ * 
+ * I encourage that you cite it as:
+ * [*] Castells-Rufas, David, and Jordi Carrabina. "128-core Many-Soft-Core Processor with MPI support." 
+ * Jornadas de Computación Reconfigurable y Aplicaciones (JCRA) (2015).
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +28,9 @@
 
 void CacheBypassRead(int* ptr, int size);
 int CacheBypassReadInt(int* ptr);
+void* CacheBypassReadPointer(void** ptr);
 void CacheBypassWriteInt(int* ptr, int v);
+void CacheBypassWritePointer(void** ptr, void* v);
 void CacheBypassWriteByte(char* ptr, char v);
 void CacheBypassReadMemcpy(int* dst, int* src, int size);
 void CacheBypassWriteMemcpy(int* dst, int* src, int size);

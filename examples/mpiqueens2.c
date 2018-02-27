@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) David Castells-Rufas, CEPHIS, Universitat Autonoma de Barcelona  
+ * david.castells@uab.cat
+ * 
+ * This work was used in the publication of 
+ * "128-core Many-Soft-Core Processor with MPI support" 
+ * available online on 
+ * https://www.researchgate.net/publication/282124163_128-core_Many-Soft-Core_Processor_with_MPI_support
+ * 
+ * I encourage that you cite it as:
+ * [*] Castells-Rufas, David, and Jordi Carrabina. "128-core Many-Soft-Core Processor with MPI support." 
+ * Jornadas de Computación Reconfigurable y Aplicaciones (JCRA) (2015).
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * mpiqueens2.c
  *
@@ -10,8 +35,21 @@
 #include <stdlib.h>
 
 
+
+#ifdef WIN32
+    #include "../arch/windows/mutex.h"
+    #include "../arch/windows/cpuid.h"
+#endif
+
+#ifdef LINUX
+    #include "../arch/linux/mutex.h"
+    #include "../arch/linux/cpuid.h"
+#endif
+
 #include "../mpi.h"
 
+
+int verbose = 0;
 
 #define MAX_N 16
 
@@ -169,7 +207,8 @@ int mpiqueens2_slave()
 #endif
       
 #ifdef LINUX
-	printf("[cpu%d] slave iterating from %d to %d for n %d\n", mpi_rank(), init, max_iter, n);
+	if (verbose)
+            printf("[cpu%d] slave iterating from %d to %d for n %d\n", mpi_rank(), init, max_iter, n);
 #endif
 	for (iter = init; iter < max_iter; iter++)
 		{
@@ -242,7 +281,8 @@ int mpiqueens2_master(int n)
 
 	int iter = 0;
 	int dead = 0;
-	int iterStep = (max_iter / 100000) * size;
+	//int iterStep = (max_iter / 100000) * size;
+        int iterStep = (max_iter / (size *100) ) ;
 
 //#pragma omp parallel for
 	do
@@ -287,7 +327,8 @@ int mpiqueens2_master(int n)
 		number_solutions += result;
 		dst = status.MPI_SOURCE;
 
-	//	printf("slave [%d] asking for work. Solutions= %d\n", dst, result);
+                if (verbose)
+                    printf("slave [%d] asking for work. Solutions= %d\n", dst, result);
 
 		if (iter >= max_iter)
 		{
@@ -385,4 +426,14 @@ int mpiqueens2_sequential(int n)
     printf("Number of found solutions is %d\n", number_solutions);
 
 	return 0;
+}
+
+
+
+int main(int argc, char** argv) 
+{
+    initMutex();
+    
+    createSlaveThreads(mpiqueens2_main);
+    return mpiqueens2_main(argc, argv);
 }

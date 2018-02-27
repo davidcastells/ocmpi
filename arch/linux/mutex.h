@@ -19,7 +19,7 @@
 #ifndef MUTEX_H_
 #define MUTEX_H_
 
-
+int initMutex();
 void mutexAcquire();
 void mutexRelease();
 int mutexState();

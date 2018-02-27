@@ -1,0 +1,30 @@
+## -*- Makefile -*-
+##
+## User: dcr
+## Time: Feb 27, 2018 1:19:33 PM
+## Makefile created by Oracle Developer Studio.
+##
+## This file is generated automatically.
+##
+
+
+all: examples
+
+## Target: examples
+examples: build/mpiqueens2_sq.exe build/mpiqueens2_mm.exe
+	
+build:
+	mkdir build
+	   
+build/mpiqueens2_sq.exe: build examples/mpiqueens2.c arch/linux/*.c buffering/mpi_single_queue.c config.h
+	gcc -g -O0 -D LINUX examples/mpiqueens2.c mpi.c arch/linux/*.c buffering/mpi_single_queue.c -o build/mpiqueens2_sq.exe
+
+build/mpiqueens2_mm.exe: build examples/mpiqueens2.c arch/linux/*.c buffering/mpi_mailbox_matrix.c config.h
+	gcc -g -O0 -D LINUX examples/mpiqueens2.c mpi.c arch/linux/*.c buffering/mpi_mailbox_matrix.c -o build/mpiqueens2_mm.exe
+	
+
+#### Clean target deletes all generated files ####
+clean:
+	rm -fr build/*
+
+

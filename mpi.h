@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) David Castells-Rufas, CEPHIS, Universitat Autonoma de Barcelona  
+ * david.castells@uab.cat
+ * 
+ * This work was used in the publication of 
+ * "128-core Many-Soft-Core Processor with MPI support" 
+ * available online on 
+ * https://www.researchgate.net/publication/282124163_128-core_Many-Soft-Core_Processor_with_MPI_support
+ * 
+ * I encourage that you cite it as:
+ * [*] Castells-Rufas, David, and Jordi Carrabina. "128-core Many-Soft-Core Processor with MPI support." 
+ * Jornadas de Computación Reconfigurable y Aplicaciones (JCRA) (2015).
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /*
  * mpi.h
  *
@@ -124,6 +149,7 @@ int MPI_Comm_rank(MPI_Comm comm, int *rank);
 int MPI_Comm_size(MPI_Comm comm,  int *size);
 double MPI_Wtime();
 int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
+
 int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request* request);
 int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
 int MPI_Test(MPI_Request* request, int* flag, MPI_Status* status);
@@ -151,5 +177,8 @@ void mpi_sleepMilliseconds(int milliseconds);
 //extern char* MPI_Debug;
 extern int mpi_global_error;
 extern double MPI_Tx_Timeout;
+
+void MPI_Debug_Show_Messages();
+void MPI_DebugInit();
 
 #endif /* MPI_H_ */

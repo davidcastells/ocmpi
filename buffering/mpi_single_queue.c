@@ -1,7 +1,34 @@
+/**
+ * Copyright (C) David Castells-Rufas, CEPHIS, Universitat Autonoma de Barcelona  
+ * david.castells@uab.cat
+ * 
+ * This work was used in the publication of 
+ * "128-core Many-Soft-Core Processor with MPI support" 
+ * available online on 
+ * https://www.researchgate.net/publication/282124163_128-core_Many-Soft-Core_Processor_with_MPI_support
+ * 
+ * I encourage that you cite it as:
+ * [*] Castells-Rufas, David, and Jordi Carrabina. "128-core Many-Soft-Core Processor with MPI support." 
+ * Jornadas de Computación Reconfigurable y Aplicaciones (JCRA) (2015).
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "../mpi.h"
 #include "../config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef WIN32
 #include "../arch/windows/PerformanceCounter.h"
@@ -245,7 +272,7 @@ void mpi_free_locked(void* p)
 	CacheBypassWriteInt(&MPI_Buffer_Count, MPI_Buffer_Count);* /
 }*/
 
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
 {
 	int rank;
 
@@ -292,9 +319,9 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
 
 	CacheBypassWriteInt(&MPI_Message_Count, CacheBypassReadInt(&MPI_Message_Count)+1);
 
-	CacheBypassWriteMemcpy(data, buf, datasize * count);
+	CacheBypassWriteMemcpy((int*)data, (int*) buf, datasize * count);
 
-	CacheBypassWriteInt((int*)&pMsg->data, (int) data);
+	CacheBypassWritePointer(&pMsg->data, data);
 	CacheBypassWriteInt((int*)&pMsg->dst , dest);
 	CacheBypassWriteInt((int*)&pMsg->src , rank);
 	CacheBypassWriteInt((int*)&pMsg->tag , tag);

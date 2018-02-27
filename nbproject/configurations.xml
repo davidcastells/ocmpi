@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="arch">
+        <df name="linux">
+          <in>CacheBypass.c</in>
+          <in>Debug.c</in>
+          <in>PerformanceCounter.c</in>
+          <in>cpuid.c</in>
+          <in>mutex.c</in>
+        </df>
+        <df name="nios">
+          <in>CacheBypass.c</in>
+          <in>Debug.c</in>
+          <in>PerformanceCounter.c</in>
+          <in>mutex.c</in>
+        </df>
+        <df name="windows">
+          <in>CacheBypass.c</in>
+          <in>Debug.c</in>
+          <in>PerformanceCounter.c</in>
+          <in>cpuid.c</in>
+          <in>mutex.c</in>
+        </df>
+      </df>
+      <df name="buffering">
+        <in>mpi_mailbox_arrays.c</in>
+        <in>mpi_mailbox_matrix.c</in>
+        <in>mpi_single_queue.c</in>
+      </df>
+      <df name="examples">
+        <in>jms_nqueens.c</in>
+        <in>mpi_pi.c</in>
+        <in>mpiqueens2.c</in>
+      </df>
+      <in>main.c</in>
+      <in>mpi.c</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>C:/Projects/Research/ocMPI/nbproject/private/launcher.properties</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>C:\Projects\Research\INT_ocMPI</Elem>
+  </sourceRootList>
+  <projectmakefile></projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <flagsDictionary>
+        <element flagsID="0" commonFlags="-O3"/>
+        <element flagsID="1" commonFlags="-g"/>
+      </flagsDictionary>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>make all</buildCommand>
+          <cleanCommand>make clean</cleanCommand>
+          <executablePath>C:\Projects\Research\INT_ocMPI\build\mpiqueens2_mm.exe</executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="./arch/linux/CacheBypass.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="./arch/linux/Debug.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="./arch/linux/PerformanceCounter.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="./arch/linux/cpuid.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="./arch/linux/mutex.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+        </cTool>
+      </item>
+      <item path="./arch/nios/CacheBypass.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/nios/Debug.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/nios/PerformanceCounter.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/nios/mutex.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/windows/CacheBypass.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/windows/Debug.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/windows/PerformanceCounter.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/windows/cpuid.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./arch/windows/mutex.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./buffering/mpi_mailbox_arrays.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./buffering/mpi_mailbox_matrix.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+        <cTool flags="1">
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>LINUX</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="./buffering/mpi_single_queue.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="0">
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>LINUX</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="./examples/jms_nqueens.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./examples/mpi_pi.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./examples/mpiqueens2.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>LINUX</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="./main.c"
+            ex="false"
+            tool="0"
+            flavor2="2">
+      </item>
+      <item path="./mpi.c"
+            ex="false"
+            tool="0"
+            flavor2="3">
+        <cTool flags="1">
+          <preprocessorList>
+            <Elem>LINUX</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <folder path="0/arch/linux">
+        <cTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>LINUX</Elem>
+          </preprocessorList>
+        </cTool>
+      </folder>
+    </conf>
+  </confs>
+</configurationDescriptor>

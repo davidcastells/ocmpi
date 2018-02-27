@@ -40,14 +40,14 @@ void MPI_Debug_Show_Messages()
         {
             MPI_Msg* pMsg = &mailslots[src][dst];
             
-            if (CacheBypassReadInt((int*)&pMsg->data) != NULL)
+            if (CacheBypassReadPointer(&pMsg->data) != NULL)
             {
                 printf("Message[%d][%d] %d -> %d *%d #%d %p\n", src, dst,
                 		CacheBypassReadInt(&pMsg->src),
                 		CacheBypassReadInt(&pMsg->dst),
                 		CacheBypassReadInt(&pMsg->count),
                 		CacheBypassReadInt(&pMsg->tag),
-                		CacheBypassReadInt((int*)&pMsg->data));
+                		CacheBypassReadPointer(&pMsg->data));
             }
         }
     
@@ -55,7 +55,7 @@ void MPI_Debug_Show_Messages()
 
 }
 
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
 {
 	int rank;
 	int datasize;
@@ -73,7 +73,7 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
     
     // wait for data zero (is the indication that mailslot is free)
     perfCounter(&t0);
-    while (CacheBypassReadInt(&pMsg->data) != NULL)
+    while (CacheBypassReadPointer(&pMsg->data) != NULL)
     {
     	perfCounter(&tf);
     	if (secondsBetweenLaps(t0, tf) > MPI_Tx_Timeout)
@@ -97,7 +97,7 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
     alt_dcache_flush(buf, datasize * count);
 #endif
     
-    CacheBypassWriteInt(&pMsg->data, (int) buf);
+    CacheBypassWritePointer(&pMsg->data, (void*)buf);
     
 #ifdef NIOS
     MPI_enterCriticalSection();
@@ -106,7 +106,7 @@ int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI
 #endif
 
     // wait for data zero (means that the message has been consumed)
-    while (CacheBypassReadInt(&pMsg->data) != NULL);
+    while (CacheBypassReadPointer(&pMsg->data) != NULL);
 }
 
 
@@ -126,7 +126,7 @@ int mpi_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
             printf("mpi_Irecv: checking msg %d -> %d p:%p %p\n", src, rank, pMsg, CacheBypassReadInt(&pMsg->data));
             MPI_leaveCriticalSection();*/
             
-            if (CacheBypassReadInt(&pMsg->data) == NULL)
+            if (CacheBypassReadPointer(&pMsg->data) == NULL)
                 continue;
             
             if (CacheBypassReadInt(&pMsg->type) != datatype)
@@ -163,7 +163,7 @@ int mpi_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
             
             MPI_Type_size(datatype, &datasize);
 
-            CacheBypassBothMemcpy(buf, CacheBypassReadInt(&pMsg->data), datasize * count);
+            CacheBypassBothMemcpy(buf, CacheBypassReadPointer(&pMsg->data), datasize * count);
 
             if (status != NULL)
             {
@@ -171,11 +171,13 @@ int mpi_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
             	status->MPI_TAG = CacheBypassReadInt(&pMsg->tag);
             }
             
+/*
             MPI_enterCriticalSection();
             printf("cpu[%d] any source received %d -> %d\n", rank, src, rank );
             MPI_leaveCriticalSection();
+*/
             // signal that we consumed the message
-            CacheBypassWriteInt(&pMsg->data , NULL);
+            CacheBypassWritePointer(&pMsg->data , NULL);
             
             return MPI_SUCCESS;
         }
@@ -188,7 +190,7 @@ int mpi_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
         MPI_Msg* pMsg = &mailslots[source][mpi_rank()];
         
         // wait for data non zero (is the indication that mailslot is full)
-        if (CacheBypassReadInt(&pMsg->data) == NULL)
+        if (CacheBypassReadPointer(&pMsg->data) == NULL)
             return MPI_ERR_PENDING;
 
         if (CacheBypassReadInt(&pMsg->type) != datatype)
@@ -213,7 +215,7 @@ int mpi_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
         CacheBypassReadMemcpy(buf, pMsg->data, datasize * count);
         
         // signal that we consumed the message
-        CacheBypassWriteInt(&pMsg->data , NULL);
+        CacheBypassWritePointer(&pMsg->data , NULL);
         
         return MPI_SUCCESS;
     }

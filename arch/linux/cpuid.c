@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
+static int creatingThreads = 1;
 pthread_t mpi_threads[NUM_OF_PROCESSORS];
 
 void  ThreadProc ( void *ptr );
@@ -28,11 +29,20 @@ void  ThreadProc ( void *ptr );
 
 int getCpuIdentifier()
 {
+    // busy wait until all threads are created
+    while (creatingThreads);
+    
     int i;
     for (i = 0; i < NUM_OF_PROCESSORS; i++)
     {
         if (mpi_threads[i] == pthread_self())
             return i;
+    }
+    
+    printf("Thread %p NOT FOUND\n", pthread_self());
+    for (i = 0; i < NUM_OF_PROCESSORS; i++)
+    {
+        printf("Tread[%d] = %p\n", i, mpi_threads[i]);
     }
     
     return -1;
@@ -42,6 +52,7 @@ void createSlaveThreads(main_func mf)
 {
     int i;
     
+    creatingThreads = 1;
     mpi_threads[0] = pthread_self();
     
     for (i = 1; i < NUM_OF_PROCESSORS; i++)
@@ -52,9 +63,10 @@ void createSlaveThreads(main_func mf)
 
         mpi_threads[i] = pth;
 
-        printf("Slave %d has handle %d\n", i, (int) mpi_threads[i]);
+        printf("Slave %d has handle %p\n", i, mpi_threads[i]);
     }
     
+    creatingThreads = 0;
 }
 
 
@@ -62,7 +74,7 @@ void ThreadProc (void* lpdwThreadParam )
 {
     main_func mf = (main_func) lpdwThreadParam;
     
-    printf("Going to invoke main from thread %d\n", (int) pthread_self());
+    printf("Going to invoke main from thread %p\n", pthread_self());
     
     (*mf)(0, NULL);
 }
